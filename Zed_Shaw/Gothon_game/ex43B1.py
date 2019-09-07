@@ -99,8 +99,10 @@ class LaserWeaponArmory(Scene):
 		code = "%d%d%d" % (randint(1,9), randint(0,9), randint(0,9))
 		guess = guesses = 0
 
+		#This is one part I've changed. This keypad guessing
+		#is framed with a while cycle that runs max 10 X.
 		while guesses < 10:
-
+			#A try except block to catch wrongly formatted combo lock inputs
 			try:
 				guess = int(raw_input("[keypad. guesses left %i]>" % (10-guesses)))
 				if len(str(guess)) != 3:
@@ -113,6 +115,7 @@ class LaserWeaponArmory(Scene):
 				print "THREE digits, remember?!"
 
 			else:
+				#Adding a cheat code if you can't guess correctly
 				if guess == 999 or guess == int(code):
 					code = guess
 					break
@@ -217,7 +220,8 @@ class EscapePod(Scene):
 			print "time.  You won!"
 			exit (1)
 
-
+#This is our new 'Trojan horse' class that leads to 
+#newly added Combat engine
 class PopUpRoom(Scene):
 
 	def enter(self):
@@ -253,10 +257,11 @@ class Map(object):
 	def opening_scene(self):
 		return self.next_scene(self.start_scene)
 
-
+#This is a new class for games
 class Game(object):
 	print "Not yet implemented!"
 
+#This is double dice game 
 class DoubleDiceCast(Game):
 
 	def __init__(self):
@@ -315,6 +320,8 @@ def compute_score(func):
 		return score
 	return wrapper
 
+#This is the actual battle engine
+#that will eventually start the game
 class Battle_Engine(object):
 
 	games2play = {'double_dice': DoubleDiceCast()
@@ -325,11 +332,12 @@ class Battle_Engine(object):
 		self.play_game = Battle_Engine.games2play.get(game)
 		return self.play_game.game_on(player, alien)
 
+#A new own error class
 class MyError(Exception):
 	"""Base class for exception in this module"""
 	pass
 
-
+#Length error for number inputs
 class InputLengthError(MyError):
 	"""Raised when number entered by user is too short or too long"""
 	"""Base class for exception in this module"""
