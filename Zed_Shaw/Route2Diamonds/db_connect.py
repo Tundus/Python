@@ -5,9 +5,9 @@ def db_exists():
 
 	diadb = mysql.connector.connect(
 		host = "localhost",
-		user = "default_user",
-		passwd = "default_passwd!",
-		database = "r2dia_database")
+		user = "r2dia",
+		passwd = "defaultpwd",
+		database = "r2diamonds_db")
 
 	mycursor = diadb.cursor()
 
@@ -20,12 +20,12 @@ def db_create():
 
 	diadb = mysql.connector.connect(
 		host = "localhost",
-		user = "default_user",
-		passwd = "default_passwd!")
+		user = "r2dia",
+		passwd = "defaultpwd")
 
 	mycursor = diadb.cursor()
 
-	mycursor.execute("CREATE DATABASE r2diadatabase")
+	mycursor.execute("CREATE DATABASE r2diamonds_db")
 
 
 db_create()
