@@ -19,5 +19,5 @@ def single_dice(x, y):
 def double_dice_2numbers(x, y):
 	return randint(x, y), randint(x, y)
 
-a = combat_engine(double_dice_2numbers)
-print a(1,6)
+#a = combat_engine(double_dice_2numbers)
+#print a(1,6)

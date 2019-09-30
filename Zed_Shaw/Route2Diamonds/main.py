@@ -1,18 +1,23 @@
 #This is the main module that will operate subordinate modules
-from map import Map
+from scene import *
+from map import *
+from db_connect import *
 
 class Engine():
 
 	def play(self):
-		a = Map()
-		next_ready = a.start_scene()
+
+		Load_tools()
+		act_scene = Map().start_scene()
 
 		while True:
-			load_next = next_ready.enter()
+			nxt_scn = act_scene.enter()
+			if nxt_scn != 'dead':
+				save_data(encode_dict(Scene().Thingy), nxt_scn, 1000, 'Player1')
+			act_scene = Map().next_scene(nxt_scn)
 
-			next_ready = a.next_scene(load_next)
-
-game = Engine()
-game.play()
+if __name__ == '__main__':
+	game = Engine()
+	game.play()
 
 

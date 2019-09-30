@@ -23,17 +23,3 @@ class Map(object):
 	def start_scene(self):
 		tools, room, health = load_data('Player1')
 		return self.scenes.get(room)
-
-Kickoff()
-act_scene = Map().start_scene()
-
-while True:
-
-	nxt_scn = act_scene.enter()
-	if nxt_scn != 'dead':
-		save_data(encode_dict(Scene().Thingy), nxt_scn, 1000, 'Player1')
-	act_scene = Map().next_scene(nxt_scn)
-
-
-__all__ = [Map]
-

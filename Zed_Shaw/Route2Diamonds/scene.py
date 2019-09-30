@@ -35,11 +35,11 @@ class Scene(object):
 				basket.append(readable_key)
 		return basket
 
-class Kickoff(Scene):
+class Load_tools(Scene):
 
 	def __init__(self):
 		r_tools, room, health = load_data('Player1')
-	
+
 		for k,v in decode_dict(r_tools).items():
 			self.Thingy[k] = v
 
@@ -222,3 +222,4 @@ class Dead(Scene):
 		exit(1)
 
 
+#__all__ = [Load_tools, Scene]
