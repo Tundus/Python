@@ -4,7 +4,7 @@ To add a little twist to the above my game saves progress into an MySql database
 
 db_connect can help you with creating and spawning databases please check its methods.
 
-This is a fully functioning program (main.py to start with) but rooms are unfinished. Only reception, meat room, knife room were implemented. If I have the time I will add the rest of it to complete the journey and to make it fun when playing on it with my son. You can finish the story too if feel so.
+This is a fully functioning program (main.py to start with) but rooms are unfinished. Only reception, meat room, knife room were implemented. If I have the time I will do the rest. You can do that too. Rooms are in scene.py. Study existing rooms and follow their lead. It will make your rooms nicely tie in.
 
 Combat engine is out of scope.
 
