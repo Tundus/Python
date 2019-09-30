@@ -32,32 +32,39 @@ def create_db():
 	try:
 		mycursor.execute("CREATE DATABASE r2diamonds_db")
 		mycursor.execute("USE r2diamonds_db")
-		mycursor.execute("CREATE TABLE gamestate(id INT AUTO_INCREMENT PRIMARY KEY, pl_name VARCHAR(64), tools VARCHAR(255), room VARCHAR(30), ts TIMESTAMP)")
+		mycursor.execute("CREATE TABLE gamestate(id INT AUTO_INCREMENT PRIMARY KEY, pl_name VARCHAR(64), tools VARCHAR(255), room VARCHAR(30), health INT, ts TIMESTAMP)")
+		save_data("Rayban_sunglasses",'reception', 1000, 'Player1')
 
 	except mysql.connector.Error as err:
 		if err.errno == errorcode.ER_BAD_DB_ERROR:
 			print ("Database connection error!: {}".format(err))
 		else:
 			raise 
+	finally:
+		if (diadb.is_connected()):
+			mycursor.close()
+			diadb.close()
 
-def save_data(tools, room, name="Player1"):
+def save_data(tools, room, health, name="Player1"):
 
 	diadb = db_connect()
 	mycursor = diadb.cursor()
 	mycursor.execute("USE r2diamonds_db")
-	query = "INSERT INTO gamestate(pl_name, tools, room) "\
-		"VALUES(%s, %s, %s)"
-	params = (name, tools, room)
+	query = "INSERT INTO gamestate(pl_name, tools, room, health) "\
+		"VALUES(%s, %s, %s, %s)"
+	params = (name, tools, room, health)
 
 	try:
 		mycursor.execute(query, params)
-
 		diadb.commit()
-		mycursor.close()
-		diadb.close()
 
 	except mysql.connector.Error:
 		raise
+
+	finally:
+		if (diadb.is_connected()):
+			mycursor.close()
+			diadb.close()
 
 
 def load_data(p_name):
@@ -66,9 +73,7 @@ def load_data(p_name):
 	mycursor = diadb.cursor()
 	mycursor.execute("USE r2diamonds_db")
 
-	query = "SELECT *  FROM gamestate WHERE pl_name = %s ORDER BY ts DESC"
-
-	#print (query, % params)
+	query = "SELECT tools, room, health  FROM gamestate WHERE pl_name = %s ORDER BY ts DESC"
 
 	try:
 		mycursor.execute(query, (p_name,))
@@ -95,20 +100,20 @@ def encode_dict(dikt):
 	for k,v in dikt.items():
 		if v == True:
 			encoded.append(k)
-	
-	return encoded
+
+	return '?'.join(encoded)
+
+
+def decode_dict(meta):
+	lets_dict = dict()
+
+	spl_meta = meta.split('?')
+
+	for elem in spl_meta:
+		lets_dict[str(elem)] = True
+
+	return lets_dict
 
 #list_dbs()
 #drop_db('r2diamonds_db')
 #create_db()
-
-t = dict()
-t['Yellow_key'] = True
-t['Big_meat_chunk'] = True
-T = ' '.join(encode_dict(t))
-print ("%r" % T)
-
-save_data(T, 'meat')
-a = load_data('Player1')
-for i in a:
-	print (i)
