@@ -6,9 +6,9 @@ db_connect can help you with creating and spawning databases please check its me
 
 This is a fully functioning program (main.py to start with) but rooms are unfinished. Only reception, meat room, knife room were implemented. If I have the time I will do the rest. You can do that too. Rooms are in scene.py. Study existing rooms and follow their lead. It will make your rooms nicely tie in.
 
-Combat engine is out of scope.
+Combat engine is out of scope. If you want to utilise it please have a look at the Gothon Game for ideas. For your convenience combat.py is placed in here. It is a slightly advanced version of my Gothon Game solution since you can choose from more than one game but be warried the heavy part is ahead.
 
-Implementing a non db version is out of scope.
+Implementing a non db version (without saving stages) is out of scope.
 
    
 
