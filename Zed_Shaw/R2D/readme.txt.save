@@ -1,0 +1,10 @@
+In Lesson 45 (Learn Python the Hard Way by Zed Shaw) students are tasked to go through a big project and try to make it work. They are requested to create a new game similar to the Gothon Game but their
+code should be organised into multiple files and their classes, methods, variables to be imported as funcionality requires. Rooms should be organised into classes, named by their purpose and in general a proper 
+class, method naming should be used. That is it.
+
+To make things a bit more interesting I have implemented a twist. Earlier, in connection with an other Zork like game task, Zed suggested some research on ways  progress our journey stages could be saved 
+in a database.
+My program requires a working MySql db with 
+
+
+   
