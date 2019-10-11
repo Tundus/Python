@@ -2,5 +2,6 @@
 
 #A more efficent methond to import files 
 #than using from .map import Map
-from Route2Diamonds import map.Map, main.Engine
+from map import Map
+from  main import Engine
 

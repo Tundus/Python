@@ -35,6 +35,15 @@ class Scene(object):
 				basket.append(readable_key)
 		return basket
 
+	@classmethod
+	def set_comp(cls, ans_s={}, exit_s={}):
+		w_set = ans_s.intersection(exit_s) 
+		if len(w_set) == 1:
+			return list(w_set)
+		else:
+			return None
+
+
 class Load_tools(Scene):
 
 	def __init__(self):
@@ -66,14 +75,20 @@ class Reception(Scene):
 			print "\n*You have the following door options: %r" % self.exits.keys()
 			print ("#You have the following items: %r" % Scene.basket())
 			next = raw_input('\nWhat do you do next? |-> ')
+			a_set = set(next.split())
+			key_set = self.exits.keys()
+			i_sect = Scene.set_comp(a_set, key_set)[0]
+			print (a_set, key_set, i_sect)
+
+
 			print  ("_"*10)
 
-			if 'pick' in next  in next:
+			if 'pick' in next:
 				print "Key picked, well done!"
 				self.Thingy['Yellow_key'] = True
 
-			elif self.exits.has_keys(next):
-				return self.exits.get(next)
+			elif self.exits.has_key(i_sect):
+				return self.exits.get(i_sect)
 
 			elif 'drop' in next and 'key' in next:
 				print "Key dropped!"
