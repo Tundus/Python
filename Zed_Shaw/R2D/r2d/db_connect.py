@@ -88,6 +88,33 @@ def load_data(p_name):
 			mycursor.close()
 			diadb.close()
 
+def delete_gamestate(roll_back_stage_num):
+	try:
+		diadb = db_connect()
+		mycursor = diadb.cursor()
+
+		mycursor.execute("USE r2diamonds_db")
+		mycursor.execute("SELECT MAX(id) FROM gamestate")
+		res = mycursor.fetchone()
+		max_id = res[0]
+		param = int(max_id) - int(roll_back_stage_num)
+
+		query = "DELETE FROM gamestate WHERE id > %s"
+		mycursor.execute(query, (param, ))
+		diadb.commit()
+		mycursor.execute("SELECT * FROM gamestate WHERE id > %s", (param, ))
+		records = mycursor.fetchall()
+		if len(records) == 0:
+			print ("\nRecord Deleted successfully")
+
+	except mysql.connector.Error as error:
+		print("Failed to delete record from table: {}".format(error))
+	finally:
+		if (diadb.is_connected()):
+			mycursor.close()
+			diadb.close()
+			print ("MySQL connection is closed!")
+
 def drop_db(db_name):
 
 	diadb = db_connect()
