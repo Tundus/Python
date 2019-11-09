@@ -1,24 +1,28 @@
-#This is our Map module with every scene/room in this game.
-#Scene() classes should come first as Map() class will need to know about them.
-#Recent scenes/rooms are: Reception, Meat, Knife, Scorpion, Diamond, 
-#Gold, KoiPond, Escape, Dead. Gold and KoiPond were included for  
-#saluting Zed Shaw.
-
+"""
+This is our Scene module with every scene/room in this game.
+Recent scenes/rooms are: Reception, Meat, Knife, Scorpion, Diamond, 
+Gold, KoiPond, Escape, Dead. Gold and KoiPond were included as a
+salute to Zed Shaw my inspiraton and guide to this game.
+"""
 from collections import defaultdict
 from random import randint
 from db_connect import *
 from lexicon import *
 from parser import *
+import time
 
 class Scene(object):
 
 
-	#In most of rooms players should pick things up. Withouth them
-	#they won't be able to pass through rooms they will attend
-	#along their journeys. When they picked their stuff it will be
-	#added to their Thingy basket that is represented with the below
-	#dictionary. These things can be put down or can have different values
-	#depending on my intentions and user actions..
+	"""
+	In most of our rooms players should pick things up . Withouth those 'things'
+	they won't be able to pass through rooms they will attend
+	along their journeys. Sometimes though if they pick the wrong thing they
+	will well die. When they picked their stuff it will be
+	added to their 'Thingy' basket that is represented with the below
+	dictionary. These things can be put down or can have different values
+	depending on my intentions and user actions..
+	"""
 	Thingy = dict()
 
 	def __init_(self):
@@ -29,6 +33,11 @@ class Scene(object):
 
 	@classmethod
 	def basket(cls):
+		"""
+		Players collect items that they find along the journies in a basket.
+		Content of their baskets are shown in every room they enter.
+		If they pick up or drop something it will be place in here and basket refreshes.
+		"""
 		basket = []
 		for k,v in cls.Thingy.items():
 			if v == True:
@@ -36,17 +45,23 @@ class Scene(object):
 				readable_key = ' '.join(split_key)
 				basket.append(readable_key)
 		return basket
-
-	@classmethod
-	def set_comp(cls, ans_s={}, exit_s={}):
-		w_set = ans_s.intersection(exit_s) 
-		if len(w_set) == 1:
-			return list(w_set)
-		else:
-			return None
+#
+#	@classmethod
+#	def set_comp(cls, ans_s={}, exit_s={}):
+#		w_set = ans_s.intersection(exit_s) 
+#		if len(w_set) == 1:
+#			return list(w_set)
+#		else:
+#			return None
 
 	@classmethod
 	def natural_lang(cls, user_input):
+		"""
+		This method utilises lexicon and parser modules that does
+		the 'natural language' processing bit. Every user input will
+		be arranged into a subject+verb+object+number structure.
+		If a ParserError occures it will be raised.
+		"""
 		try :
 			word_list = scan(user_input)
 			pwl = parse_sentence(word_list)
@@ -54,16 +69,18 @@ class Scene(object):
 
 			if not pwl.number:
 				parsed_input.pop(-1)
-			
+
 			parsed_sentence = ' '.join(parsed_input)
 			return parsed_sentence
 
-		except ParserError as err:
-			return ('ParserError', err)
+		except ParserError:
+			raise
 
 
 class Load_tools(Scene):
-
+	"""
+	This class loads saved tools from db.
+	"""
 	def __init__(self):
 		r_tools, room, health = load_data('Player1')
 
@@ -90,38 +107,38 @@ class Reception(Scene):
 			print "A yellow key lays on the floor!"
 
 		while True:
-			print "\n*You have the following door options: %r" % self.exits.keys()
-			print ("#You have the following items: %r" % Scene.basket())
-			next = raw_input('\nWhat do you do next? |-> ')
+			try:
+				print "\n*You have the following door options: %r" % self.exits.keys()
+				print ("#You have the following items: %r" % Scene.basket())
+				next = raw_input('\nWhat do you do next? |-> ')
 
-			print  ("_"*10)
-			parsed_sentence = Scene.natural_lang(next)
-			has_direction = parsed_sentence.split()[-1]
+				print  ("_"*10)
+				parsed_sentence = Scene.natural_lang(next)
+				has_direction = parsed_sentence.split()[-1]
 
-			if parsed_sentence == "player pick key":
-				if  self.Thingy['Yellow_key'] == False:
-					print "Key picked, well done!"
-					self.Thingy['Yellow_key'] = True
+				if parsed_sentence == "Player1 pick key":
+					if  self.Thingy['Yellow_key'] == False:
+						print "Key picked, well done!"
+						self.Thingy['Yellow_key'] = True
+					else:
+						print "What key please? You already have a key!"
+
+				elif  peek(scan(has_direction)) == 'direction':
+					return self.exits.get(has_direction)
+
+				elif parsed_sentence == 'Player1 drop key':
+					if self.Thingy['Yellow_key'] == True:
+						print "Key dropped!"
+						self.Thingy['Yellow_key'] = False
+					else:
+						print "Sorry you don't have a key to drop!"
+
 				else:
-					print "What key please? You already have a key!"
+					print "I dont't uderstand!"
+					print "Try something else pls!"
 
-			elif  peek(scan(has_direction)) == 'direction':
-				return self.exits.get(has_direction)
-
-			elif parsed_sentence == 'player drop key':
-				if self.Thingy['Yellow_key'] == True:
-					print "Key dropped!"
-					self.Thingy['Yellow_key'] = False
-				else:
-					print "Sorry you don't have a key to drop!"
-
-			elif parsed_sentence[0] == 'ParserError':
-				print parsed_sentence[1]
-
-			else:
-				print "I dont't uderstand!"
-				print "Try something else pls!"
-
+			except ParserError as err:
+				print err
 
 class MeatRoom(Scene):
 
@@ -137,46 +154,60 @@ class MeatRoom(Scene):
 		print "There is a huge piece of meat on a chopping block!"
 
 		while True:
-			print "\n*You have the following door options: %r" % str(self.exits.keys())
-			print ("#You have the following items: %r" % Scene.basket())
- 			next = raw_input("\nWhat do you do next? |-> ")
-			print  ("_"*10)
-			parsed_sentence = Scene.natural_lang(next)
-			has_direction = parsed_sentence.split()[-1]
+			try:
+				print "\n*You have the following door options: %r" % str(self.exits.keys())
+				print ("#You have the following items: %r" % Scene.basket())
+	 			next = raw_input("\nWhat do you do next? |-> ")
+				print  ("_"*10)
+				parsed_sentence = Scene.natural_lang(next)
+				print (parsed_sentence)
+				has_direction = parsed_sentence.split()[-1]
 
 
-			if parsed_sentence == 'player pick meat':
-				if self.Thingy['Big_meat_chunk'] == False:
-					print "Well done! You have a massive chunk of meat!"
-					self.Thingy['Big_meat_chunk'] = True
-				else:
-					print 'Don\'t be greedy'
+				if parsed_sentence == 'Player1 pick meat':
+					if self.Thingy['Big_meat_chunk'] == False:
+						print "Well done! You have a massive chunk of meat!"
+						self.Thingy['Big_meat_chunk'] = True
+					else:
+						print 'Don\'t be greedy'
 
-			elif parsed_sentence == 'player drop meat':
-				if self.Thingy['Big_meat_chunk'] == True:
-					print "Meat dropped!"
-					self.Thingy['Big_meat_chunk'] = False
-				else:
-					print "You don't have anything to drop!"
-
-			elif peek(scan(has_direction)) == 'direction':
-				if self.Thingy['Big_meat_chunk'] == True:
-					print ("This is a dodgy bridge and you're too heavy with the meat.")
-					print ("It collapses and you fall into a chasm!")
-					return 'dead'
-
-				elif self.Thingy['Big_meat_chunk'] == False:
-					return self.exits.get(has_direction)
-
-			elif parsed_sentence == 'player cut meat' or parsed_sentence == 'player slice meat':
-				if  self.Thingy['Big_kitchen_knife'] == True:
+				elif parsed_sentence == 'Player1 drop meat':
 					if self.Thingy['Big_meat_chunk'] == True:
-						print "Congrats! You cut the meat in half you already had!"
+						print "Meat dropped!"
+						self.Thingy['Big_meat_chunk'] = False
+					else:
+						print "You don't have anything to drop!"
 
-					elif self.Thingy['Big_meat_chunk'] == False: 
-						print "Well done! You have a slice of meat!"
+				elif peek(scan(has_direction)) == 'direction':
+					if self.Thingy['Big_meat_chunk'] == True:
+						print ("This is a dodgy bridge and you're too heavy with the meat.")
+						print ("It collapses and you fall into a chasm!")
+						return 'dead'
 
-					self.Thingy['Meat_slice'] = True
+					elif self.Thingy['Big_meat_chunk'] == False:
+						return self.exits.get(has_direction)
+
+				elif parsed_sentence == 'Player1 cut meat' or parsed_sentence == 'Player1 slice meat':
+					if  self.Thingy['Big_kitchen_knife'] == True:
+						if self.Thingy['Big_meat_chunk'] == True:
+							print "Congrats! You cut the meat in half you already had!"
+
+						elif self.Thingy['Big_meat_chunk'] == False: 
+							print "Well done! You have a slice of meat!"
+
+						self.Thingy['Meat_slice'] = True
+
+				elif parsed_sentence[0] == 'ParserError':
+					print parsed_sentence[1]
+
+				else:
+					print "I dont't uderstand!"
+					print "Try something else pls!"
+
+
+			except ParserError as err:
+				print err
+
 
 class KnifeRoom(Scene):
 
@@ -201,48 +232,91 @@ class KnifeRoom(Scene):
 
 
 		while True:
-			print "\n*Your door options are: %r" % self.exits.keys()
-			print ("#You have the following items: %r" % Scene.basket())
-			next = raw_input("\nWhat do you do next? |-> ")
-			print  ("_"*10)
-			parsed_sentence = Scene.natural_lang(next)
-			has_direction = parsed_sentence.split()[-1]
+			try:
+				print "\n*Your door options are: %r" % self.exits.keys()
+				print ("#You have the following items: %r" % Scene.basket())
+				next = raw_input("\nWhat do you do next? |-> ")
+				print  ("_"*10)
+				parsed_sentence = Scene.natural_lang(next)
+				has_direction = parsed_sentence.split()[-1]
 
-			if parsed_direction == 'player pick knife':
-				if self.Thingy['Big_kitchen_knife'] == False:
-					print "Who said it is cold enough down here for the ice?"
-					print "The ice has long melted! Good spot mate!"
-					self.Thingy['Big_kitchen_knife'] = True
-				elif self.Thingy['Big_kitchen_knife'] == True:
-					print "What do you mean by that? There is no knife is here!"
+				if parsed_sentence == 'player pick knife':
+					if self.Thingy['Big_kitchen_knife'] == False:
+						print "Who said it is cold enough down here for the ice?"
+						print "The ice has long melted! Good spot mate!"
+						self.Thingy['Big_kitchen_knife'] = True
+					elif self.Thingy['Big_kitchen_knife'] == True:
+						print "What do you mean by that? There is no knife is here!"
 
-			elif parsed_sentence == 'player drop knife':
-				if self.Thingy['Big_kitchen_knife'] == True:
-					print "Knife dropped!"
-					self.Thingy['Big_kitchen_knife'] = False
-				elif self.Thingy['Big_kitchen_knife'] == False:
-					print "Pardon?"
+				elif parsed_sentence == 'player drop knife':
+					if self.Thingy['Big_kitchen_knife'] == True:
+						print "Knife dropped!"
+						self.Thingy['Big_kitchen_knife'] = False
+					elif self.Thingy['Big_kitchen_knife'] == False:
+						print "Pardon?"
 
-			elif parsed_sentence == 'player smash ice' or parsed_sentence == 'player burn ice':
-				if self.Thingy['Big_kitchen_knife'] == False:
-					print "You can't do that! You don't have the right equipment!"
-					print "Try something else!"
+				elif parsed_sentence == 'player smash ice' or parsed_sentence == 'player burn ice':
+					if self.Thingy['Big_kitchen_knife'] == False:
+						print "You can't do that! You don't have the right equipment!"
+						print "Try something else!"
 
-			elif peek(scan(has_direction) == 'direction':
-				return self.exits.get(has_direction)
+				elif peek(scan(has_direction)) == 'direction':
+					return self.exits.get(has_direction)
 
-			else:
-				print "Sorry, I dont' understand!"
+				elif parsed_sentence[0] == 'ParserError':
+					print parsed_sentence[1]
+
+				else:
+					print "I dont't uderstand!"
+					print "Try something else pls!"
+
+			except ParserError as err:
+				print err
 
 class Scorpions(Scene):
 
-	exits = {'left': 'scorpion', 'middle': 'knife', 'right': 'meat'}
+	exits = {'behind': 'reception', 'opposite': 'koipond'}
 
 	def __init__(self):
 		pass
 
 	def enter(self):
-		pass
+		print "You enter a pitch dark room."
+                print "The door shuts behind you with a bang."
+		print "It looks as the floor was moving."
+		print "As your eyes adopts you realise that..."
+		print "the room is full of scorpions."
+		print "You have 10 seconds before they reach to you!"
+
+		start_t = time.time()
+		while int(time.time() - start_t) < 10:
+			try:
+				print "\n*Your door options are: %r" % self.exits.keys()
+				print ("#You have the following items: %r" % Scene.basket())
+				min, sec = divmod(10 - int(time.time()-start_t), 60)
+				next = raw_input("\nWhat do you do next? (remaining time: {:02d}:{:02d}) |-> ".format(min, sec))
+				print  ("_"*10)
+
+				parsed_sentence = Scene.natural_lang(next)
+				has_direction = parsed_sentence.split()[-1]
+
+				if parsed_sentence == 'Player1 drop meat':
+					if self.Thingy['Meat_slice'] == True:
+						print "Well done! The scorpions jump on the juicy meat!"
+						print "While they are busy eating you can slip out of the room!"
+						return self.exits.get('oposite')
+
+				elif parsed_sentence == 'Player1 leave room!':
+					return self.exits.get('opposite')
+
+				else:
+					print "I dont't uderstand!"
+					print "Try something else pls!"
+
+			except ParserError as err:
+				print err
+		print "\nTime is up!\n"
+		return 'dead'
 
 class DiamondRoom(Scene):
 

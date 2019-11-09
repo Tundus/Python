@@ -1,7 +1,7 @@
-direction = ['north', 'south', 'east', 'west', 'down', 'up', 'left', 'right', 'back', 'middle', 'left', 'right']
-verbs = ['go', 'stop', 'kill', 'eat', 'open', 'take', 'drop', 'walk', 'pick']
-stops = ['the', 'in', 'of', 'from', 'at', 'it', 'to']
-nouns = ['door', 'bear', 'princess', 'cabinet', 'key']
+direction = ['oposite', 'north', 'south', 'east', 'west', 'down', 'up', 'left', 'right', 'back', 'middle', 'left', 'right']
+verbs = ['go', 'stop', 'kill', 'eat', 'open', 'take', 'drop', 'walk', 'pick', 'run', 'cut', 'slice']
+stops = ['up', 'the', 'in', 'of', 'from', 'at', 'it', 'to']
+nouns = ['door', 'bear', 'princess', 'cabinet', 'key', 'meat']
 d = {'direction': direction, 'verb': verbs, 'stop': stops, 'noun': nouns}
 
 def stack():

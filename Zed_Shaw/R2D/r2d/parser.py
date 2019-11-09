@@ -89,7 +89,7 @@ def parse_sentence(word_list):
 		return parse_subject(word_list, subj)
 
 	elif start == "verb":
-		return parse_subject(word_list, ('noun', 'player'))
+		return parse_subject(word_list, ('noun', 'Player1'))
 
 	elif start == "error":
 		missing_word = match(word_list, 'error')
