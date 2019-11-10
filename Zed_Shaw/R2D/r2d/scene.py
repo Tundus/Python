@@ -1,8 +1,8 @@
 """
 This is our Scene module with every scene/room in this game.
 Recent scenes/rooms are: Reception, Meat, Knife, Scorpion, Diamond, 
-Gold, KoiPond, Escape, Dead. Gold and KoiPond were included as a
-salute to Zed Shaw my inspiraton and guide to this game.
+Gold, KoiPond, Escape, Dead. Gold- and KoiPond rooms were included as a
+salute to Zed Shaw who is my inspiraton and guide on my python journey.
 """
 from collections import defaultdict
 from random import randint
@@ -59,7 +59,7 @@ class Scene(object):
 		"""
 		This method utilises lexicon and parser modules that does
 		the 'natural language' processing bit. Every user input will
-		be arranged into a subject+verb+object+number structure.
+		be arranged into a subject+verb+object+number (number only if present)structure.
 		If a ParserError occures it will be raised.
 		"""
 		try :
@@ -286,14 +286,15 @@ class Scorpions(Scene):
 		print "It looks as the floor was moving."
 		print "As your eyes adopts you realise that..."
 		print "the room is full of scorpions."
-		print "You have 10 seconds before they reach to you!"
+		print "You have 15 seconds before they reach you!"
+
 
 		start_t = time.time()
 		while int(time.time() - start_t) < 10:
 			try:
 				print "\n*Your door options are: %r" % self.exits.keys()
 				print ("#You have the following items: %r" % Scene.basket())
-				min, sec = divmod(10 - int(time.time()-start_t), 60)
+				min, sec = divmod(15 - int(time.time()-start_t), 60)
 				next = raw_input("\nWhat do you do next? (remaining time: {:02d}:{:02d}) |-> ".format(min, sec))
 				print  ("_"*10)
 
@@ -305,9 +306,11 @@ class Scorpions(Scene):
 						print "Well done! The scorpions jump on the juicy meat!"
 						print "While they are busy eating you can slip out of the room!"
 						return self.exits.get('oposite')
+					else:
+						print "You don't have anything to drop!"
 
-				elif parsed_sentence == 'Player1 leave room!':
-					return self.exits.get('opposite')
+				elif parsed_sentence == 'Player1 leave room' or parsed_sentence == "Player1 exit room":
+					return self.exits.get('behind')
 
 				else:
 					print "I dont't uderstand!"
